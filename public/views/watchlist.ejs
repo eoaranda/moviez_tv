@@ -1,0 +1,19 @@
+  <!-- Page Content -->
+  <div class="container">
+  <div class="header">Watchlist</div>
+    <% if(results.length > 0) { %>
+      <div class="content">
+        <% results.forEach(function(movie) { %>
+        <div class="imageHolder">
+          <a href="/movie/<%= movie.movieId %>"><img id="poster" src="<%= movie.poster %>"></a>
+          <div class="caption"><%= movie.name %></div>
+        </div>
+        <% }); %>
+      </div>
+    <% } else { %>
+      <div class="pageContent" id="search">
+        You have not selected any movies for your watchlist.
+      </div>
+    <% } %>
+  </div>
+  <!-- /.container -->

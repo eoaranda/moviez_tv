@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="eoaranda">
+    <meta name="theme-color" content="#212121" />
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Moviez</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="/css/thumbnail-gallery.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.2/css/all.css" integrity="sha384-/rXc/GQVaYpyDdyxK+ecHPVYJSN9bmVFBvjA/9eOB+pb3F2w2N6fc5qB9Ew5yIns"
+        crossorigin="anonymous">
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <div id="menu" class="navbar-bottom">
+        <a href="#home" id="home" class="active">Home</a>
+        <a href="#filters" id="filters">Filters</a>
+        <a href="#watchlist" id="watchlist">Watchlist</a>
+        <a href="#search" id="search"><i class="fas fa-search"></i></a>
+    </div>
+
+    <page></page>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="/vendor/jquery/jquery.min.js"></script>
+    <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+      <script type = "text/javascript" language = "javascript">
+          let socket = io.connect();
+
+         $(document).ready(function() {
+            $('page').load('/home');
+
+            $('#menu a').click(function (e) {
+                e.preventDefault();
+                $('a').removeClass('active');
+                $(this).addClass('active');
+                let link = "/" + $(this).attr("id");
+                $('page').load(link);
+            });
+
+            $('.poster a').click(function (e) {
+                e.preventDefault();
+                let link = "movie/" + $(this).attr("id");
+                $('page').load(link);
+            })
+            
+         });
+
+         function menuPage(linkPage){
+            $('a').removeClass('active');
+             let link = "/" + linkPage;
+            $('page').load(link);
+         }
+
+         function movieDetail(movieId){
+            $('a').removeClass('active');
+            let link = "movie/" + movieId;
+            $('page').load(link);
+         }
+      </script>
+</body>
+
+</html>

@@ -1,0 +1,92 @@
+<!-- Page Content -->
+<div class="container">
+    <div class="header">Filters&nbsp;&nbsp;
+        <div class="btn-group">
+            <div class="dropdown show">
+                <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown"
+                    aria-haspopup="true" aria-expanded="false">
+                    Genre
+                </a>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                    <% genres.forEach(function(element) { %>
+                    <a class="dropdown-item" onclick="addToFilter('g','<%= element %>')" href="#">
+                        <%= element %></a>
+                    <% }); %>
+                </div>
+            </div>
+            &nbsp;&nbsp;
+            <div class="dropdown show">
+                <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown"
+                    aria-haspopup="true" aria-expanded="false">
+                    Year
+                </a>
+                <div class="dropdown-menu">
+                    <% for(var i = year; i >= 1888; i--){  %>
+                    <a class="dropdown-item"  onclick="addToFilter('y','<%= i %>')"  href="#">
+                        <%= i %></a>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+        </div>
+    <div id="selectedFilters">
+    </div>
+    <div id="filterResults">
+     Find what to watch next.
+    </div>
+</div>
+<!-- /.container -->
+
+
+  <script>
+  let tokens = [];
+
+  function addToFilter(type, filterString){
+    if(tokens.indexOf(filterString) < 0){ // if not found add 
+      tokens.push({filterString:filterString, type:type});
+    }
+    createTokens(); // will rewrite the entire tokens
+  }
+
+  function createTokens(){
+    let field = $('#selectedFilters');
+    field.html('');
+    tokens.forEach(function (val, index){
+      field.append("<span id= 'token' onclick='removeElement("+index+")'>"+val.filterString+"&nbsp;&nbsp;<i class='fas fa-times-circle'></i></span>");
+    })
+    startSearch();
+  }
+
+  function removeElement(index){
+    tokens.splice(index, 1);
+    createTokens();
+  }
+
+  function startSearch(){
+    console.log("start the search...")
+    
+    let paramsYear = [];
+    let paramsGenre = [];
+
+    tokens.forEach(function (val, index){
+      if(val.type == 'y'){
+        paramsYear.push(val.filterString);
+      }
+    })
+
+    tokens.forEach(function (val, index){
+      if(val.type == 'g'){
+        paramsGenre.push(val.filterString);
+      }
+    })
+
+    $.post( "/filter", { yearParams: paramsYear,genreParams: paramsGenre })
+      .done(function( data ) {
+      $('#filterResults').html(data);
+    });
+  }
+  </script>
+
+</body>
+
+</html>

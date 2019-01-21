@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset=“utf-8” />
+    <title>Moviez Player</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <link href="https://fonts.googleapis.com/css?family=Muli" rel="stylesheet">
+    <style type="text/css">
+        * {
+            font-family: 'Muli', sans-serif;
+            margin: 0;
+            padding: 0;
+            border: 0;
+            background-color: #212227;
+        }
+
+        body {
+            height: 100%;
+        }
+
+        #player {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+        }
+
+        /* For the Player Instance DIV */
+        .full {
+            left: 0px;
+            top: 0px;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* This is purely for the demo */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        #screenStatus {
+            color: #e6e6e6;
+            text-align: center;
+            margin-top: 180px;
+            width: 100%;
+        }
+
+        .centerAll {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            /* bring your own prefixes */
+            transform: translate(-50%, -50%);
+        }
+
+        #videoPlayer {
+            display: none;
+        }
+
+
+
+        .loader {
+            position: absolute;
+            top: calc(50% - 50px);
+            left: calc(50% - 50px);
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            perspective: 800px;
+        }
+
+        .inner {
+            position: absolute;
+            box-sizing: border-box;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+        }
+
+        .inner.one {
+            left: 0%;
+            top: 0%;
+            animation: rotate-one 1.15s linear infinite;
+            border-bottom: 3px solid #006600;
+        }
+
+        .inner.two {
+            right: 0%;
+            top: 0%;
+            animation: rotate-two 1.15s linear infinite;
+            border-right: 3px solid #4CAF50;
+        }
+
+        .inner.three {
+            right: 0%;
+            bottom: 0%;
+            animation: rotate-three 1.15s linear infinite;
+            border-top: 3px solid #ccff99;
+        }
+
+        @keyframes rotate-one {
+            0% {
+                transform: rotateX(35deg) rotateY(-45deg) rotateZ(0deg);
+            }
+
+            100% {
+                transform: rotateX(35deg) rotateY(-45deg) rotateZ(360deg);
+            }
+        }
+
+        @keyframes rotate-two {
+            0% {
+                transform: rotateX(50deg) rotateY(10deg) rotateZ(0deg);
+            }
+
+            100% {
+                transform: rotateX(50deg) rotateY(10deg) rotateZ(360deg);
+            }
+        }
+
+        @keyframes rotate-three {
+            0% {
+                transform: rotateX(35deg) rotateY(55deg) rotateZ(0deg);
+            }
+
+            100% {
+                transform: rotateX(35deg) rotateY(55deg) rotateZ(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="placeHolder" class='centerAll'>
+        <div class="loader">
+            <div class="inner one"></div>
+            <div class="inner two"></div>
+            <div class="inner three"></div>
+        </div>
+        <div id='screenStatus'>Ready to stream.</div>
+    </div>
+
+    <div class="html5-video-container" data-layer="0">
+        <div id="videoPlayer" class="container">
+            <video id='player' class='full' autobuffer="autobuffer" autoplay="autoplay" loop="loop" src="" controlslist='nodownload'>
+            </video>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script>
+
+        window.addEventListener('load', function () {
+
+            function updateOnlineStatus(event) {
+                //var condition = navigator.onLine ? "online" : "offline";
+                if (!navigator.onLine) {
+                    $('#screenStatus').html("There is no Internet connection");
+                    $(".inner.one").css("border-bottom", "3px solid #484848");
+                    $(".inner.two").css("border-right", "3px solid #A0A0A0	");
+                    $(".inner.three").css("border-top", "3px solid #DCDCDC");
+                } else {
+                    $('#screenStatus').html("Ready to stream");
+                    $(".inner.one").css("border-bottom", "3px solid #006600");
+                    $(".inner.two").css("border-right", "3px solid #4CAF50");
+                    $(".inner.three").css("border-top", "3px solid #ccff99");
+                }
+            }
+            window.addEventListener('online', updateOnlineStatus);
+            window.addEventListener('offline', updateOnlineStatus);
+        });
+
+
+        function videoWidget(filename) {
+
+            let validVideoExt = ["3g2", "3gp", "aaf", "asf", "avchd", "avi", "drc", "flv", "m2v", "m4p", "m4v", "mkv",
+                "mng", "mov", "mp2", "mp4", "mpe", "mpeg", "mpg", "mpv", "mxf", "nsv", "ogg", "ogv", "qt", "rm",
+                "rmvb", "roq", "svi", "vob", "webm", "wmv", "yuv"
+            ];
+            let ext = filename.split('.').pop();
+
+            console.log("The extension is : " + ext);
+            if (ext && validVideoExt.includes(ext)) {
+                console.log("we are in ! ");
+                //in this case we will play directly the file
+                return filename;
+            }
+
+        }
+
+        const socket = io.connect();
+        // const player = new Plyr('#player');
+        let pl = document.getElementById('player');
+        let wasPlaying = false;
+
+        socket.on('watchVideo', function (data) {
+            if (wasPlaying == false) {
+                let file = videoWidget(data.file);
+                $("#videoPlayer").show();
+                $("#placeHolder").hide();
+                pl.src = data.file; //file 
+                pl.load();
+                pl.play();
+            } else {
+                pl.play();
+            }
+        });
+
+        socket.on('errorVideo', function (data) {
+            $("#placeHolder").show();
+        });
+
+        socket.on('pauseVideo', function () {
+            pl.pause();
+        });
+
+        function watchVideo(data) {
+
+        }
+    </script>
+
+</body>
+
+</html>

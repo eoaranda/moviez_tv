@@ -1,0 +1,37 @@
+
+     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/"><i class="fas fa-film"></i>&nbsp;Moviez</a>
+            <a class="navbar-brand" href="#" id="config" onClick="menuPage('config')"><i class="fas fa-cog"></i></a>
+        </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container">
+        <% if(!results) { %>
+        <div class="pageContent" id="search">
+            Not Found.
+        </div>
+        <% } else if(results.length == 0) { %>
+        <div class="pageContent" id="search">
+            Not Found.
+        </div>
+        <% } else if(results.length > 0) { %>
+        <div class="content">
+            <% results.forEach(function(movie) { %>
+            <div class="imageHolder">
+                <a class="poster" href="#<%= movie.movieId %>" onClick='movieDetail(<%= movie.movieId %>)'><img src="<%= movie.poster %>"></a>
+                <div class="caption">
+                    <div class="text">
+                        <%= movie.name %>
+                    </div>
+                </div>
+            </div>
+            <% }); %>
+        </div>
+        <% } else { %>
+        <div class="pageContent" id="search">
+            Find what to watch next.
+        </div>
+        <% } %>
+    </div>

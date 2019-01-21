@@ -1,0 +1,31 @@
+    
+    <!-- Page Content -->
+    <div class="container">
+        <% if(!results) { %>
+        <div class="pageContent" id="search">
+            Not Found.
+        </div>
+        <% } else if(results.length == 0) { %>
+        <div class="pageContent" id="search">
+            Not Found.
+        </div>
+        <% } else if(results.length > 0) { %>
+        <div class="content">
+            <% results.forEach(function(movie) { %>
+            <div class="imageHolder">
+                <a id="poster" href="#<%= movie.movieId %>" onClick='movieDetail(<%= movie.movieId %>)'><img src="<%= movie.poster %>"></a>
+                <div class="caption">
+                    <div class="text">
+                        <%= movie.name %>
+                    </div>
+                </div>
+            </div>
+            <% }); %>
+        </div>
+        <% } else { %>
+        <div class="pageContent" id="search">
+            Find what to watch next.
+        </div>
+        <% } %>
+    </div>
+    <!-- /.container -->

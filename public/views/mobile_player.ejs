@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <meta name="theme-color" content="#212121" />
+  <title>Moviez</title>
+
+  <!-- Bootstrap core CSS -->
+  <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Custom styles for this template -->
+  <link href="/css/thumbnail-gallery.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.2/css/all.css" integrity="sha384-/rXc/GQVaYpyDdyxK+ecHPVYJSN9bmVFBvjA/9eOB+pb3F2w2N6fc5qB9Ew5yIns"
+    crossorigin="anonymous">
+</head>
+
+<body>
+
+
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+      <a class="navbar-brand" href="/"><i class="fas fa-film"></i>&nbsp;Moviez</a>
+      <a class="navbar-brand" href="/search"><i class="fas fa-search"></i></a>
+    </div>
+  </nav>
+
+
+  <div class="navbar-bottom">
+    <a href="/">Home</a>
+    <a href="/filters">Filters</a>
+    <a href="/watchlist">Watchlist</a>
+    <a href="/config" class="active"><i class="fas fa-cog"></i></a>
+  </div>
+
+
+  <!-- Page Content -->
+  <div class="container main">
+  <div>
+  <a href="/movie/<%= movie.movieId %>"><img src="<%= movie.coverUrl %>"></a>
+  <%= movie.name %>
+  </div>
+
+  <div class="status"></div>
+  <div class="btn-group" role="group" aria-label="Basic example">
+    <button type="button" class="btn btn-dark btn-lg"><i class="fas fa-backward"></i></button>
+    <button onclick="stopAction()" type="button" class="btn btn-dark btn-lg"><i class="fas fa-stop"></i></button>
+    <button onclick="playAction(<%= movie.movieId %>)" type="button" class="btn btn-dark btn-lg"><i class="fas fa-play"></i></button>
+    <button type="button" class="btn btn-dark btn-lg"><i class="fas fa-forward"></i></button>
+  </div>
+</div>
+
+
+  <!-- /.container -->
+
+
+
+  <!-- Bootstrap core JavaScript -->
+  <script src="/vendor/jquery/jquery.min.js"></script>
+  <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    // First of all, connect to the server (our desktop app)
+    let socket = io.connect();
+
+    function playAction(movieId){
+      socket.emit('watchVideo', {movieId: movieId});
+      $('.status').html("Video will start to play briefly...");
+    }
+
+    function pauseAction(){
+      socket.emit('pauseVideo');
+      $('.status').html("Video has been paused.");
+    }
+
+    socket.on('watchVideo', function (data) {
+      console.log('We have sent the movie to the player so we can now redirect..');
+    });
+  </script>
+
+</body>
+
+</html>
