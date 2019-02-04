@@ -12,15 +12,28 @@ body {
 }
 
 img {
-  width: 100%; /* or any custom size */
-  height: 100%; 
+  width: 100%;
+  /* or any custom size */
+  height: 100%;
   object-fit: contain;
 }
 
-.container{
+#head-spacer {
+  height: 20px;
+}
+
+.container {
   color: #e6e6e6;
 }
 
+/*
+.movie-controls {
+  background-color: #e6e6e6;
+  width: 100%;
+  height: 2em;
+  color: white;
+}
+*/
 .content {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -37,15 +50,19 @@ img {
   height: auto;
 }
 
-.space-top{
-  margin-top: 1em;
+.space-top {
+  margin-top: 2px;
+}
+
+.space-bottom {
+  margin-bottom: 8px;
 }
 
 .imageHolder {
-  width:150px;
+  width: 150px;
 }
 
-.caption{
+.caption {
   height: 3em;
 }
 
@@ -55,10 +72,11 @@ img {
   bottom: 0px;
   color: #e6e6e6;
   background: #303030;
-  text-align: center;  
+  text-align: center;
   font-size: 2vh;
   padding: 1vh;
 }
+
 
 /* trash can for stuff we might not use any more
 .main {
@@ -68,18 +86,22 @@ img {
 }
 */
 
-.header{
+.header {
   font-size: 4vh;
   font-weight: bold;
 }
 
-.header-sm{
+p{
+  font-size: 2vh;
+}
+
+.header-sm {
   font-size: 2vw;
   font-weight: bold;
 }
 
-.pageContent{
-  color:  #e6e6e6;
+.pageContent {
+  color: #e6e6e6;
   font-family: Montserrat;
   text-align: justify;
   text-justify: inter-word;
@@ -87,14 +109,14 @@ img {
   /*margin: 1em;*/
 }
 
-.configDetail{
-  color:#9e9e9e;
-  font-size: 2vw;
+.configDetail {
+  color: #9e9e9e;
+  font-size: 2vh;
   font-weight: bold;
 }
 
-a.textLink{
-  color:#4CAF50;
+a.textLink {
+  color: #4CAF50;
 }
 
 hr {
@@ -103,8 +125,9 @@ hr {
   border: 0;
   border-top: 1px solid #9e9e9e;
   margin: 1em 0;
-  padding: 0; 
+  padding: 0;
 }
+
 /*
 Bootstrap color override 
 */
@@ -131,7 +154,7 @@ menu bottom
   display: block;
   color: #e6e6e6;
   text-align: center;
-  padding: 14px 16px;
+  padding: 10px 16px;
   text-decoration: none;
   font-size: 3vh;
 }
@@ -141,52 +164,70 @@ menu bottom
   color: #4CAF50;
 }
 
-
-.controls{
-  color:  #e6e6e6;
+.img-tiny {
+  width: 30px;
+  height: auto;
+  margin-right: 10px;
 }
 
-.status{
+.navbar-bottom #movie-controls {
+  display: none;
+  background-color: white;
+  width: 100%;
+  font-size: 4vw;
+  padding: 3px;
+  height: 7vh;
+}
+
+.controls {
   color: #e6e6e6;
 }
 
-.play-movie {border-radius: 24px;}
+.status {
+  color: #e6e6e6;
+}
 
-.movie-title{
+.play-movie {
+  border-radius: 24px;
+}
+
+.movie-title {
   color: #e6e6e6;
   font-family: Montserrat;
   font-size: 4vw;
 }
 
-.movie-data{
-  color:#9e9e9e;
+.movie-data {
+  color: #9e9e9e;
   font-family: Montserrat;
   font-size: 4vw;
 
 }
-.movie-data-overview{
-  color:#9e9e9e;
+
+.movie-data-overview {
+  color: #9e9e9e;
   font-family: Montserrat;
-  font-size: 3vw;
+  font-size: 2vh;
   text-align: justify;
   text-justify: inter-word;
+  padding: 2vh;
 }
 
-.succesful{
+.succesful {
   background-color: #D3ECD9;
   color: #155724;
 }
 
-.error{
+.error {
   background-color: #F1DEDE;
   color: #A94442;
 }
 
-.poster{
-  width:auto;
-  height:auto;
-  max-width:100%;
-  max-height:50vh;
+.poster {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 50vh;
 }
 
 /*
@@ -198,37 +239,38 @@ Search input
   text-align: left;
   border: 0px;
   padding: 2vw;
-  width:100%;
+  width: 100%;
   background-color: #424242;
-  color:#E0E0E0;
-  padding-left:3em;
+  color: #E0E0E0;
+  padding-left: 3em;
   box-shadow: none;
   font-size: 5vw;
 }
+
 .field-input input:focus {
   outline: none;
 }
 
 .searchIcon {
-    font-size:5vw;
-    position:absolute; 
-    top:3vw;
-    left:2vw;
-    color:#BDBDBD;
+  font-size: 5vw;
+  position: absolute;
+  top: 3vw;
+  left: 2vw;
+  color: #BDBDBD;
 }
 
-.dropdown-menu{
-  overflow: scroll; 
-  height:40vh;
+.dropdown-menu {
+  overflow: scroll;
+  height: 40vh;
   font-size: 4vw;
 }
 
-#selectedFilters{
+#selectedFilters {
   color: white;
   padding: 2vh;
 }
 
-#token{
+#token {
   font-size: 2vh;
   color: #E4E4E4;
   border: 2px solid #4CAF50;
@@ -239,30 +281,134 @@ Search input
   float: left;
 }
 
-#filterResults{
+#filterResults {
   clear: left;
   padding-top: 2vh;
 }
 
-#topDetail{
+#topDetail {
   clear: left;
   padding-top: 2vh;
 }
 
-#topDetail h2{
+#topDetail h2 {
   font-size: 4vh;
   font-weight: bold;
   padding-top: 1vh;
   padding-bottom: 1vh;
 }
 
-#navigationBar{
+#navigationBar {
   font-size: 4vh;
   padding-left: 3vh;
   color: white;
   padding-top: 1vh;
   padding-bottom: 1vh;
-  border-bottom:1px solid #9e9e9e ;
+  border-bottom: 1px solid #9e9e9e;
   border-bottom-width: thin;
-  opacity: 0.5;  
+  opacity: 0.5;
+}
+
+#movie-control-header {
+  float: left;
+  width: 92%;
+}
+
+#play-pause-button {
+  font-size: 4vh;
+  padding-top: 1vh;
+}
+
+#movie-detail-title {
+  font-size: 3vh;
+  color: #fff;
+}
+
+/*
+Range slider
+*/
+#slider-container {
+  justify-content: center;
+  display: none;
+  text-align: center;
+  font-size: 1vh;
+  padding-top: 4px;
+}
+
+input[type="range"] {
+  margin: auto;
+  -webkit-appearance: none;
+  position: relative;
+  width: calc(100% - 2px);
+  overflow: hidden;
+  cursor: pointer;
+}
+
+input[type="range"]:focus {
+  outline: none;
+}
+
+::-webkit-slider-runnable-track {
+  background: #e6e6e6;
+}
+
+/*
+ * 1. Set to 0 width and remove border for a slider without a thumb
+ */
+::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 0;
+  /* 1 */
+  height: 8px;
+  background: #4CAF50;
+  box-shadow: -100vw 0 0 100vw #4CAF50;
+  border: none;
+  /* 1 */
+}
+
+::-moz-range-track {
+  height: 20px;
+  background: #e6e6e6;
+}
+
+::-moz-range-thumb {
+  background: #4CAF50;
+  height: 20px;
+  width: 20px;
+  border: 3px solid #999;
+  border-radius: 100% !important;
+  box-shadow: -100vw 0 0 100vw #e6e6e6;
+  box-sizing: border-box;
+  border-radius: 3px;
+}
+
+::-ms-fill-lower {
+  background: #e6e6e6;
+}
+
+::-ms-thumb {
+  background: #fff;
+  border: 2px solid #999;
+  height: 20px;
+  width: 20px;
+  box-sizing: border-box;
+}
+
+::-ms-ticks-after {
+  display: none;
+}
+
+::-ms-ticks-before {
+  display: none;
+}
+
+::-ms-track {
+  background: #e6e6e6;
+  color: transparent;
+  height: 20px;
+  border: none;
+}
+
+::-ms-tooltip {
+  display: none;
 }

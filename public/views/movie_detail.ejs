@@ -1,74 +1,67 @@
     <!-- Page Content -->
     <div class="container">
-        <div id="topDetail">
-        <h2><%= movie.name %></h2>
-        </div>
+    <div id="head-spacer"></div>
         <div class="row">
             <div class="col-4">
-            <a href="/movie/<%= movie.movieId %>"><img class="img-small" src="<%= movie.poster %>"></a>
+            <img class="img-small" src="<%= movie.poster %>">
             </div>
             <div class="col-8 movie-title">
                 <div class="row">
+                    <div class="col-12 movie-data"><div id="movie-detail-title"><%= movie.name %></div></div>
+                </div>
+                <div class="row space-top">
                     <div class="col-6 movie-data">
                         <%= movie.year %> |
                         <%= movie.movie_db.original_language %>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row space-top space-bottom">
                     <div class="col-6 movie-data">
                         <%= movie.movie_db.vote_average %> <i class="fas fa-star"></i></div>
                 </div>
                 <div class="row">
-                    <div class="col-12 movie-data-overview">
-                        <%= movie.movie_db.overview %>
-                    </div>
-                </div>
-
-                <div class="row space-top">
                     <div class="col-6">
-                        <button id="playButton" data-id="<%= movie.movieId %> " type="button" class="btn btn-outline-success play-movie"><i class="fas fa-play"></i>&nbsp;Play
-                            Movie</button>
+                        <button id="playButton" data-id="<%= movie.movieId %> " type="button" class="btn btn-outline-success play-movie"><i class="fas fa-play"></i>&nbsp;Play Movie</button>
+                    </div>
+                    <div class="col-6">
+                        <button id="watchlistButton" value="<%= movie.watchlist %>" data-id="<%= movie.movieId %> " type="button" class="btn btn-outline-primary play-movie">
+                        <% if(movie.watchlist == 1){ %>
+                            <i class="fas fa-check"></i>&nbsp;Watchlist
+                        <% } else{ %> 
+                            <i class="fas fa-bookmark"></i>&nbsp;Watchlist
+                        <% } %>
+                        </button>
                     </div>
                 </div>
-
             </div>
-            <div class="status"></div>
+            <div class="movie-data-overview">
+                <%= movie.movie_db.overview %>
+            </div>
         </div>
     </div>
+
     <!-- /.container -->
-
-
 
     <!-- Bootstrap core JavaScript -->
     <script>
-        // First of all, connect to the server (our desktop app)
-    
-        
         $("#playButton").click(function() {
-          let movieId = $("#playButton").attr("data-id");
-          console.log(movieId)
-          playAction(movieId);
+            let movieId = $("#playButton").attr("data-id");
+            eventPlayMovie(movieId); //we will send the movieId to the player
         });
 
-
-        function playAction(movieId) {
-            socket.emit('watchVideo', {
-                movieId: movieId
-            });
-            $('.status').html("Video will start to play briefly...");
-        }
-
-        function pauseAction() {
-            socket.emit('pauseVideo');
-            $('.status').html("Video has been paused.");
-        }
-
-        socket.on('watchVideo', function (data) {
-            console.log('We have sent the movie to the player so we can now redirect..');
-        });
-
-        socket.on('errorVideo', function (data) {
-            $('.status').html("There is a problem with the video.");
+        $("#watchlistButton").click(function() {
+            let flag = $(this).attr("value");
+            let movieId = $("#watchlistButton").attr("data-id");
+            if(flag == 1){
+                $(this).attr("value",0);
+                $('#watchlistButton').html("<i class='fas fa-bookmark'></i>&nbsp;Watchlist");
+                eventToggleWatchlist(movieId,0); 
+            } else {
+                $(this).attr("value",1);
+                $('#watchlistButton').html("<i class='fas fa-check'></i>&nbsp;Watchlist");
+                eventToggleWatchlist(movieId,1); 
+            }
+            
         });
     </script>
 

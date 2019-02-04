@@ -12,7 +12,7 @@
       value="<%= configData.JsonListPath %>">
     <small id="emailHelp" class="form-text text-muted">Populate the movie server db with a JSON file.</small>
     <br>
-    <button type="button" class="btn btn-primary"><i class="fas fa-sync"></i>&nbsp;Refresh DB</button>
+    <button type="button" class="btn btn-primary" id="refreshDb"><i class="fas fa-sync"></i>&nbsp;Refresh DB</button>
     <hr>
     <label for="exampleInputEmail1">Use Movie DB</label>
     <input type="text" class="form-control" id="movieDBKey" aria-describedby="emailHelp" placeholder="Api key (V3)"
@@ -30,22 +30,8 @@
     <p>&nbsp;</p>
     <p>This software was developed for educational purposes ONLY,
       it does not contain any links or content that infringes the law.</p>
-    <p>Follow me: <a class="textLink" href="https://github.com/eoaranda">https://github.com/eoaranda</a></p>
+    <p>Follow me: <br><a class="textLink" href="https://github.com/eoaranda">https://github.com/eoaranda</a></p>
     <p>&nbsp;</p>
-    <div class="header">Licenses used</div>
-    <p>&nbsp;</p>
-    <p>The following sets forth attribution notices for third party software that may be contained in portions of
-      this "product".</p>
-    <div class="header-sm"><i class="fas fa-chevron-right"></i>&nbsp;GIT</div>
-    <div class="header-sm"><i class="fas fa-chevron-right"></i>&nbsp;EJS</div>
-    <div class="header-sm"><i class="fas fa-chevron-right"></i>&nbsp;Socket.io</div>
-    <div class="header-sm"><i class="fas fa-chevron-right"></i>&nbsp;Bootstrap 3</div>
-    <div class="header-sm"><i class="fas fa-chevron-right"></i>&nbsp;NodeJS</div>
-    <div class="header-sm"><i class="fas fa-chevron-right"></i>&nbsp;Nginx</div>
-    <div class="header-sm"><i class="fas fa-chevron-right"></i>&nbsp;Sqlite</div>
-    <div class="header-sm"><i class="fas fa-chevron-right"></i>&nbsp;CentOS</div>
-    <div class="header-sm"><i class="fas fa-chevron-right"></i>&nbsp;jQuery</div>
-    <div class="header-sm"><i class="fas fa-chevron-right"></i>&nbsp;Fontawsome</div>
     <p>&nbsp;</p>
   </div>
 </div>
@@ -86,6 +72,12 @@ $("#shutdown").click(function(){
        console.log("shuting down system");
     });
 });
+
+$("#refreshDb").click(function(){
+   
+});
+
+
 
 
 $("#saveChanges").click(function(){

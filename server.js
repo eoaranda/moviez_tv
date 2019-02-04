@@ -7,6 +7,14 @@ const crud = require("./lib/crud");
 const imageBaseUrl = 'http://image.tmdb.org/t/p/original/';
 const bodyParser = require("body-parser");
 const urlExists = require('url-exists');
+let MOVIEDATA = {
+    id : "",
+    image: "",
+    name: "",
+    status: "",
+    duration: 0,
+    progress: 0
+}
 
 let ip = require('ip');
 let serverName = "mz.tv"
@@ -42,9 +50,7 @@ app.get('/', function (req, res) {
     res.sendFile(__dirname + '/public/app.html');
 });
 
-
 // NEW ROUTES WITH EJS
-
 app.get('/home', function (req, res) {
     crud.getMovies().then(function (data) {
         res.render('catalog', {
@@ -53,9 +59,7 @@ app.get('/home', function (req, res) {
     });
 });
 
-
 app.get('/movie/:id', function (req, res) {
-    console.log("inside the movie id");
     let movieId = req.params.id;
     crud.getMovie(movieId).then(function (data) {
         res.render('movie_detail', {
@@ -69,9 +73,9 @@ app.get('/about', function (req, res) {
 });
 
 app.get('/watchlist', function (req, res) {
-    crud.getConfigData().then(function (data) {
+    crud.getWatchlistMovies().then(function (data) {
         res.render('watchlist', {
-            results: {}
+            results: data
         });
     });
 });
@@ -112,8 +116,7 @@ app.get('/search', function (req, res) {
 app.post('/search', function (req, res) {
     let post = req.body;
     crud.searchMovies(post).then(function (data) {
-        console.log(data)
-        res.render('search', {
+        res.render('moviesresults', {
             results: data
         });
     }).catch(function (e) {
@@ -142,46 +145,8 @@ app.post('/save-config', function (req, res) {
 
 });
 
-// Socket.io handles the communication between the remote and our app in real time, 
-// so we can instantly send commands from a computer to our remote and back
-io.on('connection', function (socket) {
 
-    // These are playback controls. They receive the “play” and “pause” events from the remote
-
-    socket.on('watchVideo', function (data) {
-        console.log("watchVideo acction..." + data.movieId);
-        let movieId = data.movieId;
-        crud.getMovie(movieId).then(function (movieData) {
-            let files = JSON.parse(movieData.moviesPathJSON);
-            console.log(files)
-            let validVideoExt = ["avi", "drc", "flv", "m2v", "m4p", "m4v", "mov", "mp2", "mp4", "ogg", "ogv", "vob", "webm", "wmv", "yuv"];
-            files.forEach(function (filename) {
-                let ext = filename.split('.').pop();
-                if (ext && validVideoExt.includes(ext)) {
-                    urlExists(filename, function (err, exists) {
-                        if (exists) {
-                            //TODO:FIX THIS IN CASE THERE IS MORE THAN 1 MOVIE SEND THE FIRST THAT EXISTS AND HAS NO ERRORS AND EXIT.
-                            io.emit('watchVideo', {
-                                file: filename
-                            });
-                        } else {
-                            io.emit('errorVideo', {
-                                text: "The file does not exist."
-                            });
-                        }
-                    });
-                }
-            }); // for eeach files 
-        });
-    });
-
-    socket.on('pauseVideo', function () {
-        io.emit('pauseVideo');
-    });
-
-});
-
-// get data from the movie database example
+// get data from the movie database example , just for test
 app.get('/preview', function (req, res) {
     console.log("preview of movie...")
     crud.movieInfo(353081).then(function (data) {
@@ -203,6 +168,124 @@ let genres = function () {
     return movieGenres;
 }
 
-function populateMovieData(){
+/*
+Save temp info of the movie that is actually playing,
+we where using a temp localstorage in the browsers but it beame a mess, so insteado
+we can save the data in the memory of the server and check it in very system that connects
+*/
 
+function getPlayerMovieData(){
+    return MOVIEDATA;
 }
+
+// get data from the movie database example
+app.get('/movie-info', function (req, res) {
+    console.log("get the information of the movie playing...")
+    let data = getPlayerMovieData();
+    res.json(data)
+});
+
+app.get('/movie-info/progress', function (req, res) {
+    res.json(MOVIEDATA.progress);
+});
+
+app.post('/movie-info/progress', function (req, res) {
+    let post = req.body;
+    MOVIEDATA.progress =  post.progress;
+});
+
+
+/*
+
+SOCKET.IO SECTION
+
+*/
+
+// Socket.io handles the communication between the remote and our app in real time, 
+// so we can instantly send commands from a computer to our remote and back
+io.on('connection', function (socket) {
+    // we will get the id of the movie to watch, search in the db and the file and then send it to the TV
+    socket.on('eventPlayMovie', function (data) {
+        let movieId = data.movieId;
+        crud.getMovie(movieId).then(function (movieData) {
+            let files = JSON.parse(movieData.moviesPathJSON);
+            console.log(files)
+            let validVideoExt = ["avi", "drc", "flv", "m2v", "m4p", "m4v", "mov", "mp2", "mp4", "ogg", "ogv", "vob", "webm", "wmv", "yuv"];
+            files.forEach(function (filename) {
+                let ext = filename.split('.').pop();
+                if (ext && validVideoExt.includes(ext)) {
+                    urlExists(filename, function (err, exists) {
+                        if (exists) {
+                            MOVIEDATA.id = movieId;
+                            MOVIEDATA.name = movieData.name;
+                            MOVIEDATA.image = movieData.poster;
+                            MOVIEDATA.progress = 0;
+                            MOVIEDATA.status = "playing";
+                            //TODO:FIX THIS IN CASE THERE IS MORE THAN 1 MOVIE SEND THE FIRST THAT EXISTS AND HAS NO ERRORS AND EXIT.
+                            io.emit('emitData', {
+                                file: filename
+                            });
+                            return false;
+                        } else {
+                            io.emit('errorVideo', {
+                                text: "The file does not exist."
+                            });
+                        }
+                    });
+                }
+            }); // for eeach files 
+        });
+    });
+
+    socket.on('respondMovieLoaded', function (data){
+        MOVIEDATA.duration = data.duration;
+        io.emit('returnMovieLoaded', MOVIEDATA);
+    });
+
+    socket.on('eventPause', function () {
+        MOVIEDATA.status = "pause";
+        io.emit('emitPause');
+    });
+
+    socket.on('respondPause', function () {
+        MOVIEDATA.status = "pause";
+        io.emit('returnPause');
+    });
+
+    socket.on('eventPlay', function () {
+        MOVIEDATA.status = "play";
+        io.emit('emitPlay');
+    });
+
+    socket.on('respondPlay', function () {
+        MOVIEDATA.status = "play";
+        io.emit('returnPlay');
+    });
+
+    socket.on('eventSkipTo', function (data) {
+        io.emit('emitSkipTo',{seconds: data.seconds});
+    });
+
+    socket.on('eventToggleWatchlist', function (data){
+        let movieId = data.movieId;
+        let flag = data.flag;
+        crud.toggleWatchlist(movieId,flag).then(function (movieData) {
+        });
+    });
+
+    socket.on('respondMovieAdvance', function (seconds) {
+        MOVIEDATA.progress = seconds;
+        io.emit('returnMovieAdvance', {seconds: seconds});
+    });
+
+    socket.on('respondClearMovieData', function(){
+        io.emit('returnClearMovieData');
+        MOVIEDATA.id = "";
+        MOVIEDATA.image = "";
+        MOVIEDATA.name = "";
+        MOVIEDATA.status = "";
+        MOVIEDATA.duration = 0;
+        MOVIEDATA.progress = 0;
+    })
+
+});

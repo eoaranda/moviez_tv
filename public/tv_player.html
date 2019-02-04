@@ -145,7 +145,7 @@
 
     <div class="html5-video-container" data-layer="0">
         <div id="videoPlayer" class="container">
-            <video id='player' class='full' autobuffer="autobuffer" autoplay="autoplay" loop="loop" src="" controlslist='nodownload'>
+            <video id='player' class='full' autobuffer="autobuffer" src="" controlslist='nodownload'>
             </video>
         </div>
     </div>
@@ -153,9 +153,10 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="vendor/jquery/jquery.min.js"></script>
     <script>
+        const socket = io.connect();
+        const pl = document.getElementById('player'); //video players
 
         window.addEventListener('load', function () {
-
             function updateOnlineStatus(event) {
                 //var condition = navigator.onLine ? "online" : "offline";
                 if (!navigator.onLine) {
@@ -174,53 +175,100 @@
             window.addEventListener('offline', updateOnlineStatus);
         });
 
-
         function videoWidget(filename) {
-
             let validVideoExt = ["3g2", "3gp", "aaf", "asf", "avchd", "avi", "drc", "flv", "m2v", "m4p", "m4v", "mkv",
                 "mng", "mov", "mp2", "mp4", "mpe", "mpeg", "mpg", "mpv", "mxf", "nsv", "ogg", "ogv", "qt", "rm",
                 "rmvb", "roq", "svi", "vob", "webm", "wmv", "yuv"
             ];
             let ext = filename.split('.').pop();
-
             console.log("The extension is : " + ext);
             if (ext && validVideoExt.includes(ext)) {
                 console.log("we are in ! ");
                 //in this case we will play directly the file
                 return filename;
             }
-
         }
 
-        const socket = io.connect();
-        // const player = new Plyr('#player');
-        let pl = document.getElementById('player');
-        let wasPlaying = false;
+        socket.on('emitData', function (data) {
+            console.info("catched the play video emit ");
+            let file = videoWidget(data.file);
+            $("#videoPlayer").show();
+            $("#placeHolder").hide();
+            pl.src = data.file; //file 
+            pl.load();
+            //TODO: I HAVE DISABLED THIS SO THE MOVIE DOES NOT START FOR ALL THE TEST BUT THIS IS TEMPORAL
+            pl.play();
 
-        socket.on('watchVideo', function (data) {
-            if (wasPlaying == false) {
-                let file = videoWidget(data.file);
-                $("#videoPlayer").show();
-                $("#placeHolder").hide();
-                pl.src = data.file; //file 
-                pl.load();
-                pl.play();
-            } else {
-                pl.play();
-            }
+            // the movie is ready and is starting to play actually
+            // we can safely send the controlls to the mobile
+            pl.addEventListener('loadeddata', function () {
+                socket.emit('respondMovieLoaded', {
+                    duration: pl.duration
+                }) ;
+            }, false);
         });
-
+        //TODO: display error msg
         socket.on('errorVideo', function (data) {
-            $("#placeHolder").show();
+            //we will display an error msg
         });
 
-        socket.on('pauseVideo', function () {
+        socket.on('emitPause', function () {
             pl.pause();
+            socket.emit('respondPause');
         });
 
-        function watchVideo(data) {
+        socket.on('emitPlay', function () {
+            pl.play();
+            socket.emit('respondPlay');
+        });
 
+        socket.on('emitSkipTo', function (data) {
+            pl.currentTime = data.seconds;
+        });
+
+        socket.on('emitMovieCurrentTime', function () {
+            socket.emit('respondMovieCurrentTime', {
+                currentTime: pl.currentTime
+            });
+        });
+
+        // when the movie finishes
+        pl.onended = function (e) {
+            // if the movie finished then unload the movie from the tv
+            $("#videoPlayer").hide();
+            $("#placeHolder").show();
+        };
+
+        // when the player loads
+        function init() {
+            console.log("We are in the init");
+            socket.emit('respondClearMovieData');
+            let counter=0;
+            let prevCurrentTime=0;
+
+            // if we loaded or reloaded this screen then we need to clear the mobile variables
+            setInterval(function () {
+                let ct = pl.currentTime;
+                if (ct > 0) {
+                    console.log("respondMovieAdvance : " + ct); // will get you a lot more updates.
+                    socket.emit('respondMovieAdvance', ct);
+
+                    if(prevCurrentTime == ct){
+                        counter++;
+                        console.log(counter);
+                    }
+
+                    if(counter==144){ //144 iterations
+                        //the counter has been the same for 144 iterations aka 12min, clear everything
+                        socket.emit('respondClearMovieData');
+                        location.reload();
+                    }
+                }
+                prevCurrentTime = ct;
+            }, 5000); // from 5 secs and 5 secs
         }
+
+        window.onload = init;
     </script>
 
 </body>
