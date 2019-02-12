@@ -17,6 +17,15 @@
         $('#searchinput').focus();
     });
 
+    $("#searchinput").focusin(function() {
+        $('#menu').hide();
+    });
+
+    $("#searchinput").focusout(function() {
+      $('#menu').show();
+    });
+
+
     $(document).keypress(function(e) {
       let searchinput = $('#searchinput').val();
       if(e.which == 13 && searchinput != "") {
@@ -28,6 +37,7 @@
 
       }
     });
+    
 
   </script>
 </body>

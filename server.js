@@ -4,11 +4,16 @@ const server = require('http').Server(app);
 const io = require('socket.io')(server);
 const path = require('path')
 const crud = require("./lib/crud");
-const imageBaseUrl = 'http://image.tmdb.org/t/p/original/';
 const bodyParser = require("body-parser");
 const urlExists = require('url-exists');
+const exec = require('child_process').exec;
+const ejs = require('ejs');
+const getmac = require('getmac');
+const md5 = require('md5');
+let serverName = "mz.tv"
+
 let MOVIEDATA = {
-    id : "",
+    id: "",
     image: "",
     name: "",
     status: "",
@@ -16,9 +21,6 @@ let MOVIEDATA = {
     progress: 0
 }
 
-let ip = require('ip');
-let serverName = "mz.tv"
-let ejs = require('ejs');
 
 //setting middleware
 app.use(express.static('public'))
@@ -31,13 +33,37 @@ app.set('views', path.join(__dirname, '/public/views/'));
 
 // IO to shutdown the mz server 
 app.post('/shutdown', function (req, res) {
-    console.log("Sending shut down instructions...")
-    res.send("bye bye");
+    shutdown(function (output) {
+        res.send("bye");
+    });
+
 });
 
-app.get('/refresh-db', function (req, res) {
-    console.log("Refresh the database");
-    res.send("Refresh database");
+// IO to shutdown the mz server 
+app.post('/restart', function (req, res) {
+    reboot(function (output) {
+        res.send("bye");
+    });
+});
+
+// IO to shutdown the mz server 
+app.post('/update-code', function (req, res) {
+    update(function (output) {
+        res.send("bye");
+    });
+});
+
+//this only refreshes the movies section 
+app.post('/refresh-db', function (req, res) {
+    let jsonListPath = req.body.JsonListPath;
+    let newdata = {};
+    newdata.JsonListUpdated = new Date().toLocaleString();
+    crud.updateMovieList(jsonListPath).then(function (data) {
+        crud.saveConfig(newdata);
+        res.send(data);
+    }).catch(function (error){
+        res.status(400).send('Error');
+    });
 });
 
 // this is where we will play the movie
@@ -104,7 +130,6 @@ app.post('/filter', function (req, res) {
     });
 });
 
-
 // search landing page
 app.get('/search', function (req, res) {
     res.render('search', {
@@ -135,7 +160,6 @@ app.get('/config', function (req, res) {
 
 // save the config changes
 app.post('/save-config', function (req, res) {
-    console.log("saving data...")
     let post = req.body;
     crud.saveConfig(post).then(function (data) {
         res.status(200).send('Saved');
@@ -148,7 +172,6 @@ app.post('/save-config', function (req, res) {
 
 // get data from the movie database example , just for test
 app.get('/preview', function (req, res) {
-    console.log("preview of movie...")
     crud.movieInfo(353081).then(function (data) {
         res.json({
             data
@@ -158,9 +181,34 @@ app.get('/preview', function (req, res) {
 
 // Start Server
 server.listen(3000, function () {
-    console.log('Example app listening on ' + ip.address() + ':3000.');
+    console.log('MoviezTV server started on port 3000.');
+    init(); // set server configurations
 });
 
+function init(){
+    let deviceConfig = {}
+    let today = new Date().toLocaleString();
+
+    crud.getConfigData().then(function (data) {
+        // if empty
+        if(!data.deviceId){
+            getmac.getMac(function(err, macAddress){
+                if (err)  throw err
+                let device = macAddress + today;
+                let deviceId = md5(device);
+                deviceConfig.deviceId = deviceId;
+                crud.saveConfig(deviceConfig);
+            })
+        }
+        // if empty or 0
+        if(!data.deviceTimesStarted || data.deviceTimesStarted == 0){
+            deviceConfig.deviceTimesStarted  = 1;
+        } else{
+            deviceConfig.deviceTimesStarted  = parseInt(data.deviceTimesStarted)  + 1;
+        }
+        crud.saveConfig(deviceConfig);
+    });
+}
 
 let genres = function () {
     let movieGenres = ["Comedy", "Fantasy", "Crime", "Drama", "Music", "Adventure", "History", "Thriller", "Animation", "Family", "Mystery", "Biography", "Action", "Film-Noir", "Romance", "Sci-Fi", "War", "Western", "Horror", "Musical", "Sport"];
@@ -174,13 +222,12 @@ we where using a temp localstorage in the browsers but it beame a mess, so inste
 we can save the data in the memory of the server and check it in very system that connects
 */
 
-function getPlayerMovieData(){
+function getPlayerMovieData() {
     return MOVIEDATA;
 }
 
 // get data from the movie database example
 app.get('/movie-info', function (req, res) {
-    console.log("get the information of the movie playing...")
     let data = getPlayerMovieData();
     res.json(data)
 });
@@ -191,7 +238,7 @@ app.get('/movie-info/progress', function (req, res) {
 
 app.post('/movie-info/progress', function (req, res) {
     let post = req.body;
-    MOVIEDATA.progress =  post.progress;
+    MOVIEDATA.progress = post.progress;
 });
 
 
@@ -209,7 +256,6 @@ io.on('connection', function (socket) {
         let movieId = data.movieId;
         crud.getMovie(movieId).then(function (movieData) {
             let files = JSON.parse(movieData.moviesPathJSON);
-            console.log(files)
             let validVideoExt = ["avi", "drc", "flv", "m2v", "m4p", "m4v", "mov", "mp2", "mp4", "ogg", "ogv", "vob", "webm", "wmv", "yuv"];
             files.forEach(function (filename) {
                 let ext = filename.split('.').pop();
@@ -237,7 +283,7 @@ io.on('connection', function (socket) {
         });
     });
 
-    socket.on('respondMovieLoaded', function (data){
+    socket.on('respondMovieLoaded', function (data) {
         MOVIEDATA.duration = data.duration;
         io.emit('returnMovieLoaded', MOVIEDATA);
     });
@@ -263,22 +309,25 @@ io.on('connection', function (socket) {
     });
 
     socket.on('eventSkipTo', function (data) {
-        io.emit('emitSkipTo',{seconds: data.seconds});
+        io.emit('emitSkipTo', {
+            seconds: data.seconds
+        });
     });
 
-    socket.on('eventToggleWatchlist', function (data){
+    socket.on('eventToggleWatchlist', function (data) {
         let movieId = data.movieId;
         let flag = data.flag;
-        crud.toggleWatchlist(movieId,flag).then(function (movieData) {
-        });
+        crud.toggleWatchlist(movieId, flag).then(function (movieData) {});
     });
 
     socket.on('respondMovieAdvance', function (seconds) {
         MOVIEDATA.progress = seconds;
-        io.emit('returnMovieAdvance', {seconds: seconds});
+        io.emit('returnMovieAdvance', {
+            seconds: seconds
+        });
     });
 
-    socket.on('respondClearMovieData', function(){
+    socket.on('respondClearMovieData', function () {
         io.emit('returnClearMovieData');
         MOVIEDATA.id = "";
         MOVIEDATA.image = "";
@@ -289,3 +338,21 @@ io.on('connection', function (socket) {
     })
 
 });
+
+
+function shutdown(callback) {
+    exec('shutdown now', function (error, stdout, stderr) {
+        callback(stdout);
+    });
+}
+
+function reboot(callback) {
+    exec('shutdown -r now', function (error, stdout, stderr) {
+        callback(stdout);
+    });
+}
+
+// Need to work on much of this logic
+function update(callback) {
+    //exec('sh ./script/update.sh', function(error, stdout, stderr){ callback(stdout); });
+}

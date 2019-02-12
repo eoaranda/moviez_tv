@@ -1,110 +1,152 @@
-  <!-- Page Content -->
-  <div class="container main">
-  <div class="header">Configurations</div>
-  <div class="pageContent">
-    <p>Server ID:&nbsp;<span class="configDetail">
-        <%= configData.deviceId %></span></p>
-    <p>Movie list updated:&nbsp;<span class="configDetail">
-        <%= configData.JsonListUpdated %></span></p>
-    <hr>
-    <label for="exampleInputEmail1">JSON path</label>
-    <input type="text" class="form-control" id="JsonListPath" aria-describedby="emailHelp" placeholder="https://"
-      value="<%= configData.JsonListPath %>">
-    <small id="emailHelp" class="form-text text-muted">Populate the movie server db with a JSON file.</small>
-    <br>
-    <button type="button" class="btn btn-primary" id="refreshDb"><i class="fas fa-sync"></i>&nbsp;Refresh DB</button>
-    <hr>
-    <label for="exampleInputEmail1">Use Movie DB</label>
-    <input type="text" class="form-control" id="movieDBKey" aria-describedby="emailHelp" placeholder="Api key (V3)"
-      value="<%= configData.movieDBKey %>">
-    <small id="emailHelp" class="form-text text-muted">Search for movie info automatically using Movie DB api.</small>
-    <button type="submit" id="saveChanges" class="btn btn-success"><i class="far fa-save"></i>&nbsp;Save Changes</button>
-    <p>&nbsp;</p>
-    <div class="header">Power off</div>
-    <p>&nbsp;</p>
-    <p>To properly shutdown the movie server please click on the button below:</p>
-    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#exampleModal"><i class="fas fa-power-off"></i>&nbsp;Power
-      off</button>
-    <p>&nbsp;</p>
-    <div class="header">About</div>
-    <p>&nbsp;</p>
-    <p>This software was developed for educational purposes ONLY,
-      it does not contain any links or content that infringes the law.</p>
-    <p>Follow me: <br><a class="textLink" href="https://github.com/eoaranda">https://github.com/eoaranda</a></p>
-    <p>&nbsp;</p>
-    <p>&nbsp;</p>
-  </div>
+<!-- Page Content -->
+<div class="container main">
+    <div class="header">Configurations</div>
+    <div class="pageContent">
+        <p>Server ID:&nbsp;<span class="configDetail">
+                <%= configData.deviceId %></span></p>
+        <p>Movie list updated:&nbsp;<span class="configDetail">
+                <%= configData.JsonListUpdated %></span></p>
+        <hr>
+        <div class="header">MoviezTv </div>
+        <br>
+        <label for="exampleInputEmail1">JSON data path</label>
+        <input type="text" class="form-control" id="JsonListPath" placeholder="https://" value="<%= configData.JsonListPath %>">
+        <p>Populate the movie server db with a JSON file.</p>
+        <button type="button" class="btn btn-success" id="refreshDb"><i class="fas fa-cloud-download-alt"></i>&nbsp;&nbsp;Load Data to DB</button>
+        <!-- <button type="submit" id="saveChanges" class="btn btn-success"><i class="far fa-save"></i>&nbsp;Save Changes</button> -->
+        <hr>
+        <div class="header">Power off</div>
+        <p>To properly shutdown the movie server please click on the button below:</p>
+        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#powerOffModal"><i class="fas fa-power-off"></i>&nbsp;Power
+            off</button>
+        <button type="button" class="btn btn-warning" id="restart"><i class="fas fa-redo"></i>&nbsp;Restart</button>
+        <hr>
+        <div class="header">Software Update</div>
+        <p>Update MoviezTv to the latest version.</p>
+        <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#updateModal"><i class="fas fa-sync"></i>&nbsp;Update</button>
+        <hr>
+        <div class="header">About</div>
+        <p>This software was developed for educational purposes ONLY,
+            it does not contain any links or content that infringes the law.</p>
+        <p>Follow me: <br><a class="textLink" href="https://github.com/eoaranda" target="_blank"><i class="fab fa-github"></i> eoaranda</a></p>
+        <p>&nbsp;</p>
+        <p>&nbsp;</p>
+    </div>
 </div>
-  <!-- /.container -->
+<!-- /.container -->
 
-  <!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-<div class="modal-dialog" role="document">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h5 class="modal-title" id="exampleModalLabel">Power Off</h5>
-      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
+<!-- Modal -->
+<div class="modal fade" id="powerOffModal" tabindex="-1" role="dialog" aria-labelledby="powerOffModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="powerOffModalLabel">Power Off</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Use this option to shut down completely the movie server in a safe way.
+                <br>The green light will blink solidly 10 times (0.5 second intervals).
+                Once it stops blinking, the green light will turn off.
+                At this point, it is safe to remove the power or pull the plug.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-danger" id="shutdown">SHUTDOWN</button>
+            </div>
+        </div>
     </div>
-    <div class="modal-body">
-      Use this option to shut down completely the movie server in a safe way.
-      <br>The green light will blink solidly 10 times (0.5 second intervals). 
-      Once it stops blinking, the green light will turn off. 
-      At this point, it is safe to remove the power or pull the plug.
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-      <button type="button" class="btn btn-danger" id="shutdown">SHUTDOWN</button>
-    </div>
-  </div>
-</div>
 </div>
 
+
+<!-- Modal -->
+<div class="modal fade" id="updateModal" tabindex="-1" role="dialog" aria-labelledby="updateModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateModalLabel">Update Software</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Use this option to update the MoviezTv software base, this process will also do an inpcilit restart an
+                will take a couple of minutes, please be patient.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="update">UPDATE</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- DIV MESSAGE -->
+<div class="modal fade" id="modalMessage" tabindex="-1" role="dialog" aria-labelledby="modalMessage" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-body">
+        <div id="message"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
 
 <script>
-$('#myModal').on('shown.bs.modal', function () {
-  $('#myInput').trigger('focus')
-})
+    $('#myModal').on('shown.bs.modal', function () {
+        $('#myInput').trigger('focus')
+    })
 
-$("#shutdown").click(function(){
-    $.post("/shutdown", function(data, status){
-       console.log("shuting down system");
+    $("#shutdown").click(function () {
+        $.post("/shutdown", function (data, status) {
+            console.log("shuting down system:" + data);
+        });
     });
-});
 
-$("#refreshDb").click(function(){
-   
-});
-
-
-
-
-$("#saveChanges").click(function(){
-    let data = {};
-    data.JsonListPath = $("#JsonListPath").val();
-    data.movieDBKey = $("#movieDBKey").val();
-    $.post( "/save-config", data)
-    .done(function( data ) {
-        $("#message").addClass("succesful");
-        $("#message").html("Saved succesfully!");
-        $("#message").fadeIn();
-        setTimeout(function () {
-                  $('#message').fadeOut(function(){
-                      $(this).html('');
-                  });
-              }, 2000);    
-    }).fail(function() {
-      $("#message").addClass("error");
-      $("#message").html("There was an error");
-      $("#message").fadeIn();
-      setTimeout(function () {
-                $('#message').fadeOut(function(){
-                    $(this).html('');
-                });
-            }, 2000); 
+    $("#restart").click(function () {
+        $.post("/restart", function (data, status) {
+            console.log("restarting the system:" + data);
+        });
     });
-});
 
+    $("#update").click(function () {
+        $.post("/update-code", function (data, status) {
+            console.log("updating the system:" + data);
+        });
+    });
 
+    $("#refreshDb").click(function () {
+      console.log("refresh db");
+        let JsonListPath = $("#JsonListPath").val();
+        $.post("/refresh-db", {JsonListPath: JsonListPath})
+            .done(function (data) {
+              $("#message").removeClass("error");
+              $("#message").addClass("succesful");
+              $('#message').html('<i class="fas fa-check"></i>&nbsp;Data loaded succesfully!');
+              $('#modalMessage').modal('show')
+            }).fail(function () {
+              $("#message").removeClass("succesful");
+              $("#message").addClass("error");
+              $('#message').html('<i class="fas fa-exclamation-circle"></i>&nbsp;There was an error when trying to laod the data.');
+              $('#modalMessage').modal('show')
+            });
+    });
+
+    /*
+    Helpfull to save different changes in the configuration section
+    just need to use the correct data name , equal to the one in the db
+    */
+    $("#saveChanges").click(function () {
+        let data = {};
+        data.JsonListPath = $("#JsonListPath").val();
+        $.post("/save-config", data)
+            .done(function (data) {
+                console.log(data);
+            }).fail(function () {
+                console.log("Error")
+            });
+    });
 </script>

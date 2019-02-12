@@ -34,7 +34,6 @@ $(document).ready(function () {
     });
 
     $('#slider-controler').on('input change', function () {
-        console.log("movie control change = " + this.value);
         eventSkipTo(this.value);
     });
 
@@ -191,7 +190,7 @@ function eventToggleWatchlist(movieId, flag) {
 
 // general error
 socket.on('errorVideo', function (data) {
-    console.log(data);
+    console.log('ERROR: ' + data);
 });
 
 socket.on('returnMovieLoaded', function (data) {

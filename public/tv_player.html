@@ -181,9 +181,7 @@
                 "rmvb", "roq", "svi", "vob", "webm", "wmv", "yuv"
             ];
             let ext = filename.split('.').pop();
-            console.log("The extension is : " + ext);
             if (ext && validVideoExt.includes(ext)) {
-                console.log("we are in ! ");
                 //in this case we will play directly the file
                 return filename;
             }
@@ -204,7 +202,7 @@
             pl.addEventListener('loadeddata', function () {
                 socket.emit('respondMovieLoaded', {
                     duration: pl.duration
-                }) ;
+                });
             }, false);
         });
         //TODO: display error msg
@@ -241,24 +239,21 @@
 
         // when the player loads
         function init() {
-            console.log("We are in the init");
             socket.emit('respondClearMovieData');
-            let counter=0;
-            let prevCurrentTime=0;
+            let counter = 0;
+            let prevCurrentTime = 0;
 
             // if we loaded or reloaded this screen then we need to clear the mobile variables
             setInterval(function () {
                 let ct = pl.currentTime;
                 if (ct > 0) {
-                    console.log("respondMovieAdvance : " + ct); // will get you a lot more updates.
                     socket.emit('respondMovieAdvance', ct);
 
-                    if(prevCurrentTime == ct){
+                    if (prevCurrentTime == ct) {
                         counter++;
-                        console.log(counter);
                     }
 
-                    if(counter==144){ //144 iterations
+                    if (counter == 144) { //144 iterations
                         //the counter has been the same for 144 iterations aka 12min, clear everything
                         socket.emit('respondClearMovieData');
                         location.reload();
