@@ -354,5 +354,5 @@ function reboot(callback) {
 
 // Need to work on much of this logic
 function update(callback) {
-    //exec('sh ./script/update.sh', function(error, stdout, stderr){ callback(stdout); });
+    exec('sh ./script/update.sh', function(error, stdout, stderr){ callback(stdout); });
 }
