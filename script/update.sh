@@ -20,20 +20,18 @@ cd moviez_tv-master
 rm -r db
 rm -r script
 
-#go to parent folder
+#go to parent download folder 
 cd ..
 
-#replace all the files except this script and the db
-cp -R moviez_tv-master/ ..
+#replace all the files on the parent folder
+cp -R moviez_tv-master/* ..
 
-#delte downloaded folder
-rm -r moviez_tv-master
-
-#go to parent folder moviez_tv
-cd ..
+#delete downloaded folder
+rm -R moviez_tv-master
 
 #run the npm install
-npm install
+#cd ..
+#npm install #not for now
 
 #restar entire pi
 shutdown -r now
