@@ -5,7 +5,13 @@ echo MoviezTV Update        # This is a comment, too!
 cd download
 
 #download new version
-curl -L https://github.com/eoaranda/moviez_tv/archive/master.zip | tar zx
+curl -L https://github.com/eoaranda/moviez_tv/archive/master.zip > master.zip
+
+#unzip
+unzip master.zip
+
+#remove downloaded zip file and the unzip tmp folder
+rm master.zip
 
 #go to the newly created folder
 cd moviez_tv-master
